@@ -1,5 +1,7 @@
 import Base from "./components/Base.jsx";
+import SmoothScroll from "./components/SmoothScroll.jsx";
 import Backdrop from "./components/Backdrop.jsx";
+import Tilt from "./components/Tilt.jsx";
 import Cursor from "./components/Cursor.jsx";
 import Nav from "./components/Nav.jsx";
 import Hero from "./components/Hero.jsx";
@@ -17,8 +19,10 @@ export default function App() {
   return (
     <>
       <Base />
+      <SmoothScroll />
       <Backdrop />
       <Cursor />
+      <Tilt />
       <Nav />
       <Hero />
       <About />
