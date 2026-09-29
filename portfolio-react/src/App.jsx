@@ -1,4 +1,5 @@
 import Base from "./components/Base.jsx";
+import Backdrop from "./components/Backdrop.jsx";
 import Cursor from "./components/Cursor.jsx";
 import Nav from "./components/Nav.jsx";
 import Hero from "./components/Hero.jsx";
@@ -16,6 +17,7 @@ export default function App() {
   return (
     <>
       <Base />
+      <Backdrop />
       <Cursor />
       <Nav />
       <Hero />

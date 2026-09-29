@@ -2,11 +2,11 @@ import { useEffect, useRef } from "react";
 
 // Glowing dot cursor with a glitter trail. Click for a star burst.
 // Change the colors in COLORS, or the star shape in STAR ("✦", "★", "✧", "•").
-const COLORS = ["#22D3EE", "#8B5CF6", "#F472B6", "#FFFFFF"];
+const COLORS = ["var(--cyan)", "var(--violet)", "var(--pink)", "var(--ink)"];
 const STAR = "✦";
 
 const css = `
-.cur-dot{position:fixed;left:0;top:0;width:12px;height:12px;border-radius:50%;background:#fff;
+.cur-dot{position:fixed;left:0;top:0;width:12px;height:12px;border-radius:50%;background:var(--ink);
   box-shadow:0 0 12px 3px var(--cyan),0 0 26px 6px var(--violet);pointer-events:none;z-index:9999;
   transform:translate(-50%,-50%);opacity:0;transition:width .15s,height .15s,opacity .2s}
 .cur-dot.big{width:28px;height:28px}
