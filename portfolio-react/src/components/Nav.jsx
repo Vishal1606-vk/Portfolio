@@ -1,8 +1,11 @@
 const css = `
-nav{display:flex;gap:22px;justify-content:flex-end;padding:20px 0;flex-wrap:wrap}
-nav a{color:var(--muted);text-decoration:none;font-weight:600;font-size:.95rem}
-nav a:hover{color:var(--accent)}
-@media (max-width:760px){nav{justify-content:flex-start}}
+.nav{position:sticky;top:12px;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px;margin-top:16px}
+.nav .brand{font-weight:700;letter-spacing:.04em;color:var(--ink);text-decoration:none}
+.nav .brand span{color:var(--cyan)}
+.nav .links{display:flex;gap:20px;flex-wrap:wrap}
+.nav .links a{color:var(--muted);text-decoration:none;font-size:.95rem}
+.nav .links a:hover{color:var(--cyan)}
+@media (max-width:760px){.nav .links{display:none}}
 `;
 
 const links = [
@@ -17,10 +20,13 @@ export default function Nav() {
   return (
     <>
       <style>{css}</style>
-      <nav aria-label="Sections">
-        {links.map(([label, href]) => (
-          <a key={href} href={href}>{label}</a>
-        ))}
+      <nav className="nav glass" aria-label="Sections">
+        <a className="brand" href="#top">VK<span>.</span>analyst</a>
+        <div className="links">
+          {links.map(([label, href]) => (
+            <a key={href} href={href}>{label}</a>
+          ))}
+        </div>
       </nav>
     </>
   );

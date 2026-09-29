@@ -1,5 +1,5 @@
 const css = `
-footer{padding:32px 0;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
+footer{padding:28px 0 40px;color:var(--muted);font-size:.9rem;text-align:center}
 `;
 
 export default function Footer() {

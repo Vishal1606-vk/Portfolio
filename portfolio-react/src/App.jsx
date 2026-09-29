@@ -1,4 +1,5 @@
 import Base from "./components/Base.jsx";
+import Cursor from "./components/Cursor.jsx";
 import Nav from "./components/Nav.jsx";
 import Hero from "./components/Hero.jsx";
 import About from "./components/About.jsx";
@@ -14,6 +15,7 @@ export default function App() {
   return (
     <>
       <Base />
+      <Cursor />
       <div className="wrap">
         <Nav />
         <Hero />

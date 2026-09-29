@@ -1,12 +1,14 @@
 const css = `
 .projects{display:grid;gap:22px}
-.project{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:10px;padding:28px}
-.project:nth-child(2){border-left-color:var(--warm)}
-.project h3{font-size:1.5rem;margin-bottom:12px}
-.project > ul:not(.tags){margin:0 0 16px;padding-left:1.2em}
+.project{padding:30px;position:relative;overflow:hidden;transition:border-color .25s,box-shadow .25s}
+.project::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+.project:nth-child(2)::before{background:linear-gradient(90deg,var(--violet),var(--pink))}
+.project:hover{border-color:rgba(34,211,238,.5);box-shadow:0 0 30px rgba(34,211,238,.12)}
+.project h3{font-size:1.5rem;margin-bottom:14px}
+.project > ul:not(.tags){margin:0 0 18px;padding-left:1.2em;color:#C3CCE6}
 .project li{margin-bottom:8px;max-width:70ch}
 .tags{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
-.project .tags li{margin:0;padding:3px 12px;border:1px solid var(--line);border-radius:99px;font-size:.88rem;color:var(--muted)}
+.project .tags li{margin:0;padding:3px 12px;border:1px solid var(--line);border-radius:99px;font:.82rem "IBM Plex Mono",monospace;color:var(--cyan);background:rgba(34,211,238,.06)}
 `;
 
 // To add a project, copy one object below and change the text.
@@ -40,23 +42,13 @@ export default function Projects() {
         <h2>Projects</h2>
         <div className="projects">
           {projects.map((p) => (
-            <article className="project" key={p.title}>
+            <article className="project glass" key={p.title}>
               <h3>{p.title}</h3>
-              <ul>
-                {p.points.map((pt) => (
-                  <li key={pt}>{pt}</li>
-                ))}
-              </ul>
-              <ul className="tags">
-                {p.tags.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
+              <ul>{p.points.map((pt) => <li key={pt}>{pt}</li>)}</ul>
+              <ul className="tags">{p.tags.map((t) => <li key={t}>{t}</li>)}</ul>
               {p.link && (
-                <p style={{ marginTop: 16 }}>
-                  <a className="btn ghost" href={p.link} target="_blank" rel="noopener noreferrer">
-                    View project
-                  </a>
+                <p style={{ marginTop: 18 }}>
+                  <a className="btn" href={p.link} target="_blank" rel="noopener noreferrer">View project</a>
                 </p>
               )}
             </article>

@@ -1,4 +1,4 @@
-// No extra CSS needed: this section uses the shared styles from Base.jsx.
+// Uses shared styles from Base.jsx.
 export default function About() {
   return (
     <section id="about">
