@@ -11,22 +11,21 @@ import Contact from "./components/Contact.jsx";
 import Footer from "./components/Footer.jsx";
 
 // Page order = order of the components below.
+// Each component renders <section class="section"><div class="container">...</div></section>
 export default function App() {
   return (
     <>
       <Base />
       <Cursor />
-      <div className="wrap">
-        <Nav />
-        <Hero />
-        <About />
-        <Projects />
-        <Skills />
-        <Experience />
-        <Education />
-        <Contact />
-        <Footer />
-      </div>
+      <Nav />
+      <Hero />
+      <About />
+      <Projects />
+      <Skills />
+      <Experience />
+      <Education />
+      <Contact />
+      <Footer />
     </>
   );
 }

@@ -20,8 +20,10 @@ body{margin:0;color:var(--ink);font:400 17px/1.65 "Space Grotesk",system-ui,sans
 h1,h2,h3{line-height:1.1;margin:0;font-weight:700}
 a{color:var(--cyan)}
 :focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
-.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
-section{padding:80px 0}
+/* Every section: full width, 5% left/right, top/bottom 100px > 80px > 60px > 40px */
+.section{padding:100px 5%}
+/* Content box inside each section */
+.container{width:100%;max-width:1440px;margin:0 auto}
 h2{font-size:clamp(1.8rem,4vw,2.5rem);margin-bottom:34px}
 h2::after{content:"";display:block;width:56px;height:3px;margin-top:14px;border-radius:3px;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 14px var(--cyan)}
 p{max-width:64ch;margin:0 0 1em;color:#C3CCE6}
@@ -30,7 +32,9 @@ p{max-width:64ch;margin:0 0 1em;color:#C3CCE6}
 .btn{display:inline-block;padding:12px 24px;border-radius:10px;font-weight:700;text-decoration:none;border:1px solid var(--line);color:var(--ink);transition:box-shadow .2s,transform .2s}
 .btn.primary{border:0;color:#04101A;background:linear-gradient(90deg,var(--cyan),var(--violet))}
 .btn:hover{box-shadow:0 0 22px rgba(34,211,238,.45);transform:translateY(-2px)}
-@media (max-width:760px){section{padding:56px 0}}
+@media (max-width:1200px){.section{padding-top:80px;padding-bottom:80px}}
+@media (max-width:992px){.section{padding-top:60px;padding-bottom:60px}}
+@media (max-width:600px){.section{padding-top:40px;padding-bottom:40px}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn:hover{transform:none}}
 `;
 

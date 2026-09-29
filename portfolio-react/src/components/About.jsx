@@ -1,7 +1,7 @@
 // Uses shared styles from Base.jsx.
 export default function About() {
   return (
-    <section id="about">
+    <section className="section" id="about"><div className="container">
       <h2>About</h2>
       <p>
         I'm a Computer Science graduate (B.Tech, 2026) who enjoys finding the story inside a
@@ -13,6 +13,6 @@ export default function About() {
         analysis. I'm now looking for a role where I can keep growing in data and business
         operations.
       </p>
-    </section>
+    </div></section>
   );
 }

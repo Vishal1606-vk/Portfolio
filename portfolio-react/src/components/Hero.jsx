@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const css = `
-.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center;padding:70px 0 90px}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center}
 .hero h1{font-size:clamp(2.8rem,8vw,5.4rem);letter-spacing:-.03em;background:linear-gradient(90deg,#fff,var(--cyan) 60%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
 .type{font-size:1.25rem;color:var(--cyan);margin:20px 0 16px;min-height:1.6em}
 .type::after{content:"";display:inline-block;width:2px;height:1.1em;margin-left:4px;vertical-align:-.15em;background:var(--cyan);animation:blink 1s steps(1) infinite}
@@ -15,7 +15,7 @@ const css = `
 @keyframes draw{to{stroke-dashoffset:0}}
 @keyframes fade{to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.chart .line{animation:none;stroke-dashoffset:0}.chart .area,.chart .dot{animation:none;opacity:1}.type::after{animation:none}}
-@media (max-width:760px){.hero{grid-template-columns:1fr;padding-top:40px}}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
 `;
 
 const roles = ["Data Analyst", "Dashboard Builder", "Python and SQL Problem Solver"];
@@ -46,7 +46,7 @@ export default function Hero() {
   return (
     <>
       <style>{css}</style>
-      <header className="hero" id="top">
+      <section className="section" id="top"><div className="container hero">
         <div>
           <h1>Vishal Kumar P</h1>
           <div className="type mono" aria-label="Data Analyst">{role}</div>
@@ -76,7 +76,7 @@ export default function Hero() {
             ))}
           </svg>
         </div>
-      </header>
+      </div></section>
     </>
   );
 }

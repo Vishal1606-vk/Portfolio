@@ -17,7 +17,7 @@ export default function Skills() {
   return (
     <>
       <style>{css}</style>
-      <section id="skills">
+      <section className="section" id="skills"><div className="container">
         <h2>Skills</h2>
         <div className="skills">
           {groups.map((g) => (
@@ -27,7 +27,7 @@ export default function Skills() {
             </div>
           ))}
         </div>
-      </section>
+      </div></section>
     </>
   );
 }

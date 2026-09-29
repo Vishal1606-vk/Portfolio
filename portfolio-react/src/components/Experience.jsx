@@ -13,7 +13,7 @@ export default function Experience() {
   return (
     <>
       <style>{css}</style>
-      <section id="experience">
+      <section className="section" id="experience"><div className="container">
         <h2>Experience</h2>
         <div className="tl">
           <div className="when">March – April 2025</div>
@@ -25,7 +25,7 @@ export default function Experience() {
             <li>Helped collect, clean, and prepare large datasets from diverse business sources.</li>
           </ul>
         </div>
-      </section>
+      </div></section>
     </>
   );
 }

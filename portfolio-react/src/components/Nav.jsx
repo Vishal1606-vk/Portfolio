@@ -1,5 +1,6 @@
 const css = `
-.nav{position:sticky;top:12px;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px;margin-top:16px}
+.nav-outer{position:sticky;top:12px;z-index:10;padding:16px 5% 0}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px}
 .nav .brand{font-weight:700;letter-spacing:.04em;color:var(--ink);text-decoration:none}
 .nav .brand span{color:var(--cyan)}
 .nav .links{display:flex;gap:20px;flex-wrap:wrap}
@@ -20,6 +21,7 @@ export default function Nav() {
   return (
     <>
       <style>{css}</style>
+      <div className="nav-outer"><div className="container">
       <nav className="nav glass" aria-label="Sections">
         <a className="brand" href="#top">VK<span>.</span>analyst</a>
         <div className="links">
@@ -28,6 +30,7 @@ export default function Nav() {
           ))}
         </div>
       </nav>
+      </div></div>
     </>
   );
 }
