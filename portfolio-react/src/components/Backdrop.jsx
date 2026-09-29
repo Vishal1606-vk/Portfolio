@@ -1,118 +1,143 @@
 import { useEffect, useRef } from "react";
+import * as THREE from "three";
 
-// Scroll-driven background. As you scroll down the page it morphs through 4 scenes:
-// 1 line graphs  ->  2 bar chart  ->  3 SQL code rain  ->  4 data network.
-// The glow color also shifts (cyan -> violet -> pink -> cyan). Drawn lightly so text stays sharp.
-const SQL = ["SELECT region, SUM(revenue)", "FROM sales s", "JOIN customers c ON c.id = s.cid", "WHERE year = 2025", "GROUP BY region", "HAVING SUM(revenue) > 1000", "ORDER BY revenue DESC;", "LIMIT 10;", "COUNT(DISTINCT order_id)", "AVG(profit_margin)"];
-const GLOW = ["--cyan", "--violet", "--pink", "--cyan"];
-const SCENES = 4;
-
-const rgba = (hex, a) => {
-  const n = parseInt(hex.replace("#", "").slice(0, 6), 16);
-  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`;
-};
-
+// 3D background (three.js). As you scroll, the shapes rotate and move and the colors shift:
+// a wireframe core, floating data shapes, 3D bars and a particle field.
+// Edit the numbers in the "look" section below to change how it feels.
 export default function Backdrop() {
-  const ref = useRef(null);
+  const mountRef = useRef(null);
+
   useEffect(() => {
-    const c = ref.current, ctx = c.getContext("2d");
+    const mount = mountRef.current;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let w = 0, h = 0, raf = 0, t = 0, cur = 0, target = 0;
-    const col = {};
-    const read = () => {
-      const st = getComputedStyle(document.documentElement);
-      ["--cyan", "--violet", "--pink", "--line", "--muted"].forEach((k) => (col[k] = st.getPropertyValue(k).trim()));
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch (e) {
+      return; // no WebGL: page still works without the background
+    }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    mount.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
+    camera.position.z = 14;
+
+    // theme colors
+    const C = { a: new THREE.Color(), b: new THREE.Color(), c: new THREE.Color() };
+    const readColors = () => {
+      const s = getComputedStyle(document.documentElement);
+      C.a.set(s.getPropertyValue("--cyan").trim());
+      C.b.set(s.getPropertyValue("--violet").trim());
+      C.c.set(s.getPropertyValue("--pink").trim());
     };
-    const nodes = Array.from({ length: 38 }, () => ({ x: Math.random(), y: Math.random(), vx: (Math.random() - 0.5) * 0.02, vy: (Math.random() - 0.5) * 0.02 }));
-    const snips = Array.from({ length: 16 }, (_, i) => ({ text: SQL[i % SQL.length], x: 0.03 + ((i * 0.137) % 0.88), y: (i * 0.31) % 1, v: 0.008 + (i % 4) * 0.004 }));
+    readColors();
+    const setPal = (target, p, shift = 0) => {
+      const x = (((p + shift) % 1) + 1) % 1 * 3, i = Math.floor(x);
+      const L = [C.a, C.b, C.c, C.a];
+      target.lerpColors(L[i], L[i + 1], x - i);
+    };
+
+    // ---- look ----
+    const wire = (o) => new THREE.MeshBasicMaterial({ wireframe: true, transparent: true, opacity: o });
+
+    const hero = new THREE.Mesh(new THREE.IcosahedronGeometry(3.2, 1), wire(0.35));
+    const inner = new THREE.Mesh(new THREE.OctahedronGeometry(1.6), wire(0.5));
+    scene.add(hero, inner);
+
+    const N = 1600, pos = new Float32Array(N * 3);
+    for (let i = 0; i < N * 3; i++) pos[i] = (Math.random() - 0.5) * 60;
+    const pg = new THREE.BufferGeometry();
+    pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    const points = new THREE.Points(pg, new THREE.PointsMaterial({ size: 0.09, transparent: true, opacity: 0.7, depthWrite: false }));
+    scene.add(points);
+
+    const bars = new THREE.Group();
+    const barGeo = new THREE.BoxGeometry(0.7, 1, 0.7);
+    for (let i = 0; i < 7; i++) {
+      const m = new THREE.Mesh(barGeo, wire(0.45));
+      m.position.x = (i - 3) * 1.2;
+      m.userData = { h: 1.5 + Math.random() * 3.5, ph: Math.random() * 6 };
+      bars.add(m);
+    }
+    bars.position.z = -6;
+    scene.add(bars);
+
+    const geos = [new THREE.BoxGeometry(1, 1, 1), new THREE.TetrahedronGeometry(0.9), new THREE.TorusGeometry(0.7, 0.22, 8, 20)];
+    const floaters = Array.from({ length: 12 }, (_, i) => {
+      const m = new THREE.Mesh(geos[i % 3], wire(0.4));
+      m.position.set((Math.random() - 0.5) * 30, (Math.random() - 0.5) * 22, (Math.random() - 0.5) * 20 - 4);
+      m.userData = { y0: m.position.y, s: 0.003 + Math.random() * 0.01, i };
+      scene.add(m);
+      return m;
+    });
+
+    // ---- animation ----
+    let t = 0, cur = 0, target = 0, mx = 0, my = 0, raf = 0;
     const readScroll = () => {
       const m = document.documentElement.scrollHeight - window.innerHeight;
       target = m > 0 ? Math.min(1, Math.max(0, window.scrollY / m)) : 0;
     };
-
-    function draw() {
-      ctx.clearRect(0, 0, w, h);
-      const x = cur * (SCENES - 1);
-      const wt = (i) => Math.max(0, 1 - Math.abs(x - i));
-
-      // glow that changes color while scrolling
-      GLOW.forEach((k, i) => {
-        const a = wt(i); if (a < 0.01) return;
-        const gx = w * (i % 2 ? 0.2 : 0.8), gy = h * (0.25 + 0.2 * i % 1 + 0.15 * i);
-        const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, Math.max(w, h) * 0.6);
-        g.addColorStop(0, rgba(col[k], 0.2 * a)); g.addColorStop(1, rgba(col[k], 0));
-        ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    const frame = () => {
+      const p = cur, k = Math.min(1, camera.aspect / 1.6);
+      hero.position.set(Math.cos(p * Math.PI * 2) * 5.5 * k, Math.sin(p * Math.PI * 3) * 1.5, -2);
+      hero.rotation.set(p * Math.PI * 4 + t * 0.1, p * Math.PI * 6 + t * 0.15, 0);
+      inner.position.copy(hero.position);
+      inner.rotation.set(-p * Math.PI * 6 - t * 0.2, t * 0.1, 0);
+      points.rotation.y = p * Math.PI * 1.5 + t * 0.02;
+      points.position.y = p * 12;
+      bars.position.set((-9 + p * 14) * k, -4 + p * 2, -6);
+      bars.rotation.y = p * Math.PI * 1.2;
+      bars.children.forEach((m) => {
+        const sy = m.userData.h * (0.55 + 0.45 * Math.sin(t * 0.8 + m.userData.ph + p * 8));
+        m.scale.y = sy; m.position.y = sy / 2;
       });
-
-      // grid slides as you scroll
-      ctx.lineWidth = 1; ctx.strokeStyle = col["--line"]; ctx.globalAlpha = 0.3;
-      const off = (cur * h * 3) % 64;
-      for (let gx = 0; gx < w; gx += 64) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke(); }
-      for (let gy = -64 + off; gy < h; gy += 64) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke(); }
-
-      // scene 1: line graphs
-      if (wt(0) > 0.01) {
-        ctx.lineWidth = 2; ctx.globalAlpha = 0.32 * wt(0);
-        [["--cyan", 0.62, 0.09, 0.004, 0.6], ["--violet", 0.42, 0.07, 0.006, 0.4]].forEach(([k, yy, a, f, s]) => {
-          ctx.beginPath();
-          for (let px = 0; px <= w; px += 8) {
-            const py = h * yy + Math.sin((px + t * s * 40) * f) * h * a + Math.sin((px + t * s * 24) * f * 2.3) * h * a * 0.4;
-            px ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
-          }
-          ctx.strokeStyle = col[k]; ctx.stroke();
-        });
-      }
-      // scene 2: bar chart
-      if (wt(1) > 0.01) {
-        ctx.globalAlpha = 0.2 * wt(1);
-        for (let i = 0, n = Math.ceil(w / 48); i < n; i++) {
-          const bh = h * (0.12 + 0.3 * (0.5 + 0.5 * Math.sin(i * 0.65 + t * 0.6)));
-          ctx.fillStyle = col[i % 3 ? "--cyan" : "--violet"];
-          ctx.fillRect(i * 48 + 8, h - bh, 28, bh);
-        }
-      }
-      // scene 3: SQL code rain
-      if (wt(2) > 0.01) {
-        ctx.font = '14px "IBM Plex Mono", monospace'; ctx.fillStyle = col["--cyan"]; ctx.globalAlpha = 0.34 * wt(2);
-        snips.forEach((n) => ctx.fillText(n.text, n.x * w, ((((n.y - t * n.v) % 1) + 1) % 1) * h));
-      }
-      // scene 4: data network
-      if (wt(3) > 0.01) {
-        nodes.forEach((n) => { n.x = (n.x + n.vx / 60 + 1) % 1; n.y = (n.y + n.vy / 60 + 1) % 1; });
-        ctx.lineWidth = 1; ctx.strokeStyle = col["--pink"]; ctx.globalAlpha = 0.28 * wt(3);
-        for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
-          const dx = (nodes[i].x - nodes[j].x) * w, dy = (nodes[i].y - nodes[j].y) * h;
-          if (dx * dx + dy * dy < 24000) { ctx.beginPath(); ctx.moveTo(nodes[i].x * w, nodes[i].y * h); ctx.lineTo(nodes[j].x * w, nodes[j].y * h); ctx.stroke(); }
-        }
-        ctx.fillStyle = col["--cyan"]; ctx.globalAlpha = 0.6 * wt(3);
-        nodes.forEach((n) => { ctx.beginPath(); ctx.arc(n.x * w, n.y * h, 3, 0, 6.283); ctx.fill(); });
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    const resize = () => {
-      const d = window.devicePixelRatio || 1;
-      w = window.innerWidth; h = window.innerHeight;
-      c.width = w * d; c.height = h * d; ctx.setTransform(d, 0, 0, d, 0, 0);
-      readScroll(); if (still) cur = target; draw();
+      floaters.forEach((m) => {
+        const { y0, s, i } = m.userData;
+        m.rotation.x = p * (3 + (i % 4)) + t * s * 20;
+        m.rotation.y = p * (2 + (i % 3)) + t * s * 14;
+        m.position.y = y0 + p * (6 + (i % 5) * 1.5);
+        setPal(m.material.color, p, i / 12);
+      });
+      setPal(hero.material.color, p);
+      setPal(inner.material.color, p, 0.33);
+      setPal(points.material.color, p, 0.5);
+      setPal(bars.children[0].material.color, p, 0.15);
+      bars.children.forEach((m, i) => i && m.material.color.copy(bars.children[0].material.color));
+      camera.position.x += (mx * 1.2 - camera.position.x) * 0.05;
+      camera.position.y += (-my * 0.8 - camera.position.y) * 0.05;
+      camera.lookAt(0, 0, 0);
+      renderer.render(scene, camera);
     };
-    const loop = () => { t += 1 / 60; cur += (target - cur) * 0.08; draw(); raf = requestAnimationFrame(loop); };
-    const onScroll = () => { readScroll(); if (still) { cur = target; draw(); } };
+    const loop = () => { t += 0.016; cur += (target - cur) * 0.06; frame(); raf = requestAnimationFrame(loop); };
 
-    read(); resize();
-    if (!still) loop();
-    const mo = new MutationObserver(() => { read(); if (still) draw(); });
+    const onScroll = () => { readScroll(); if (still) { cur = target; frame(); } };
+    const onMove = (e) => { mx = e.clientX / window.innerWidth - 0.5; my = e.clientY / window.innerHeight - 0.5; };
+    const onResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      if (still) frame();
+    };
+    const onVis = () => { cancelAnimationFrame(raf); if (!document.hidden && !still) loop(); };
+    const mo = new MutationObserver(() => { readColors(); if (still) frame(); });
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-    window.addEventListener("resize", resize);
+
+    readScroll(); cur = target;
     window.addEventListener("scroll", onScroll, { passive: true });
-    const vis = () => { cancelAnimationFrame(raf); if (!document.hidden && !still) loop(); };
-    document.addEventListener("visibilitychange", vis);
+    window.addEventListener("resize", onResize);
+    if (!still) { window.addEventListener("pointermove", onMove); document.addEventListener("visibilitychange", onVis); loop(); }
+    else frame();
+
     return () => {
       cancelAnimationFrame(raf); mo.disconnect();
-      window.removeEventListener("resize", resize); window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("visibilitychange", vis);
+      window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onResize);
+      window.removeEventListener("pointermove", onMove); document.removeEventListener("visibilitychange", onVis);
+      scene.traverse((o) => { o.geometry?.dispose?.(); o.material?.dispose?.(); });
+      renderer.dispose();
+      renderer.domElement.remove();
     };
   }, []);
 
-  return <canvas ref={ref} aria-hidden="true" style={{ position: "fixed", inset: 0, width: "100%", height: "100%", zIndex: -1, pointerEvents: "none" }} />;
+  return <div ref={mountRef} aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: -1, pointerEvents: "none" }} />;
 }
