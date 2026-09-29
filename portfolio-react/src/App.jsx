@@ -1,5 +1,4 @@
 import Base from "./components/Base.jsx";
-import SmoothScroll from "./components/SmoothScroll.jsx";
 import Backdrop from "./components/Backdrop.jsx";
 import Tilt from "./components/Tilt.jsx";
 import Cursor from "./components/Cursor.jsx";
@@ -19,7 +18,6 @@ export default function App() {
   return (
     <>
       <Base />
-      <SmoothScroll />
       <Backdrop />
       <Cursor />
       <Tilt />
