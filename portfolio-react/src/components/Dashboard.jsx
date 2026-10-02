@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 
-// Mini Power BI style dashboard with sample data. Move the cursor across it:
-// the SQL WHERE clause, the KPIs and the trend line all filter to the region you point at.
+// Mini Power BI style dashboard with sample data. Hover a bar:
+// the SQL WHERE clause, the KPIs and the trend line all filter to that region.
 const DATA = {
   North: { t: [42, 48, 51, 47, 58, 63], m: 18 },
   South: { t: [35, 38, 44, 49, 46, 55], m: 22 },
@@ -47,23 +47,16 @@ const css = `
 
 export default function Dashboard() {
   const [sel, setSel] = useState(null);
-  const barsRef = useRef(null);
   const s = stats(sel);
   const totals = REGIONS.map((r) => sum(DATA[r].t));
   const maxT = Math.max(...totals);
   const lo = Math.min(...s.t), hi = Math.max(...s.t);
   const pts = s.t.map((v, i) => [10 + i * 36, 85 - ((v - lo) / (hi - lo || 1)) * 62]);
 
-  const onMove = (e) => {
-    const r = barsRef.current.getBoundingClientRect();
-    const f = (e.clientX - r.left) / r.width;
-    setSel(REGIONS[Math.min(4, Math.max(0, Math.floor(f * 5)))]);
-  };
-
   return (
     <>
       <style>{css}</style>
-      <div className="dash glass" onPointerMove={onMove} onPointerLeave={() => setSel(null)}>
+      <div className="dash glass">
         <div className="top">
           <div className="dots"><i /><i /><i /></div>
           <span className="mono">Sales dashboard · sample data</span>
@@ -80,15 +73,16 @@ export default function Dashboard() {
           <div className="kpi"><small>Growth Jan-Jun</small><b>+{s.growth.toFixed(0)}%</b></div>
         </div>
         <div className="charts">
-          <div ref={barsRef}>
+          <div>
             <p className="cap">Revenue by region</p>
-            <svg viewBox="0 0 200 110" role="img" aria-label="Revenue by region bar chart">
+            <svg viewBox="0 0 200 110" role="img" aria-label="Revenue by region bar chart" onPointerLeave={() => setSel(null)}>
               {REGIONS.map((r, i) => {
                 const h = (totals[i] / maxT) * 66, x = 10 + i * 38;
                 return (
                   <g key={r}>
                     <rect className={"bar" + (sel === r || !sel ? " on" : "")} style={!sel ? { opacity: 0.85, filter: "none" } : undefined} x={x} y={88 - h} width="28" height={h} rx="4" />
                     <text className="lab" x={x + 14} y="102" textAnchor="middle">{r.slice(0, 3)}</text>
+                    <rect x={x - 5} y="0" width="38" height="110" fill="transparent" onPointerEnter={() => setSel(r)} onPointerDown={() => setSel(r)} />
                     {sel === r && <text className="tip" x={x + 14} y={82 - h} textAnchor="middle">{totals[i]}K</text>}
                   </g>
                 );
@@ -104,7 +98,7 @@ export default function Dashboard() {
             </svg>
           </div>
         </div>
-        <p className="hint">Move your cursor over the dashboard to filter it.</p>
+        <p className="hint">Hover over a bar to filter the dashboard.</p>
       </div>
     </>
   );
