@@ -6,7 +6,7 @@ const css = `
 .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 18px;background:var(--navbg)}
 .nav .left{display:flex;align-items:center;gap:18px}
 .nav .brand{display:flex;align-items:center;text-decoration:none}
-.nav .brand img{display:block;height:36px;width:auto;filter:drop-shadow(0 0 8px rgba(255,190,60,.35))}
+.nav .brand .logo{display:block;width:50px;height:36px;background:var(--ink);-webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--cyan) 45%,transparent))}
 .nav .links{display:flex;gap:20px;flex-wrap:wrap}
 .nav .links a{color:var(--muted);text-decoration:none;font-size:.95rem}
 .nav .links a:hover{color:var(--cyan)}
@@ -24,7 +24,7 @@ export default function Nav() {
           <nav className="nav glass" aria-label="Sections">
             <div className="left">
               <ThemeToggle />
-              <a className="brand" href="#top" aria-label="Vishal Kumar P, back to top"><img src={logo} alt="VK" /></a>
+              <a className="brand" href="#top" aria-label="Vishal Kumar P, back to top"><span className="logo" role="img" aria-label="VK" style={{ "--logo": `url(${logo})` }} /></a>
             </div>
             <div className="links">{links.map(([l, h]) => <a key={h} href={h}>{l}</a>)}</div>
           </nav>

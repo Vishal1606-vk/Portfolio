@@ -17,26 +17,42 @@ const css = `
 // Optional: add  link: "https://github.com/..."  to show a "View project" button.
 const projects = [
   {
-    title: "Smart Loan Lending Ally",
-    summary: "A tool that helps judge loan applications by scoring each applicant's risk and showing what drives approval.",
+    title: "Retail Sales Analytics",
+    summary: "An end-to-end analysis of retail sales, from raw data to findings and business recommendations.",
     points: [
-      "Analyzes applicant financial data to predict how likely a loan is to be approved and to flag risk factors.",
-      "Uses statistical modeling and basic machine learning for credit risk scoring.",
-      "Includes exploratory data analysis and preprocessing to clean and structure the applicant datasets.",
-      "Dashboards show lending trends, approval rates and risk segments, so decisions are easier to explain.",
+      "Cleans and prepares the raw data with pandas and analyzes it with SQL.",
+      "Excel summaries and an interactive Power BI dashboard present the sales performance.",
+      "Documents the data cleaning steps, key findings and recommendations.",
     ],
-    tags: ["Python", "Machine learning", "EDA", "Dashboards"],
+    tags: ["SQL", "pandas", "Excel", "Power BI"],
   },
   {
-    title: "Power BI Sales & Business Performance Dashboard",
-    summary: "One interactive dashboard where a business can see sales, revenue and performance by region and over time.",
+    title: "Customer Churn Analysis",
+    summary: "Finds what is linked to customers leaving and predicts who is likely to leave.",
     points: [
-      "Tracks sales, revenue and business performance across regions and time periods.",
-      "Connects and transforms data from multiple sources with Power Query, then models the relationships so filters cross-filter correctly.",
-      "DAX measures calculate KPIs such as revenue growth, profit margin and customer retention.",
-      "Built to support data-driven decisions, with every visual updating together when you filter.",
+      "Analyzes customer data with SQL and Python to identify the factors linked to churn.",
+      "A logistic regression model predicts which customers are likely to leave, going beyond reporting to prediction.",
+      "Findings are presented with recommendations for improving customer retention.",
     ],
-    tags: ["Power BI", "Power Query", "DAX", "KPIs"],
+    tags: ["SQL", "Python", "Logistic regression"],
+  },
+  {
+    title: "Retail Sales KPI Dashboard",
+    summary: "An interactive Power BI dashboard that tracks the key retail sales and business performance KPIs.",
+    points: [
+      "Tracks key retail sales and business performance KPIs in one report.",
+      "DAX measures calculate the KPIs, and the report is designed so results can be filtered and compared.",
+    ],
+    tags: ["Power BI", "DAX", "KPIs"],
+  },
+  {
+    title: "SQL Data Warehouse & ETL",
+    summary: "A SQL data warehouse with ETL processes that turn source data into analysis-ready tables.",
+    points: [
+      "ETL processes extract, clean and transform source data.",
+      "The warehouse is structured so the data can be used directly for reporting and analysis.",
+    ],
+    tags: ["SQL", "ETL", "Data warehousing"],
   },
 ];
 

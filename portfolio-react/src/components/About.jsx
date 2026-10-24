@@ -39,7 +39,7 @@ export default function About() {
             <div className="facts">
               <div className="fact glass"><b>B.Tech, Computer Science</b><span>Jain University, 2022 to 2026 · CGPA 7.6</span></div>
               <div className="fact glass"><b>Data Analyst Intern</b><span>Zintlr, Bengaluru · March to April 2025</span></div>
-              <div className="fact glass"><b>2 projects</b><span>Loan risk scoring and a Power BI sales dashboard</span></div>
+              <div className="fact glass"><b>4 projects</b><span>Sales analytics, churn prediction, a KPI dashboard and an ETL warehouse</span></div>
             </div>
           </div>
           <div className="steps">
